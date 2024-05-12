@@ -1,0 +1,74 @@
+<template>
+    <div class="col-xxl-8 col-lg-12 box-col-12">
+        <div class="card">
+            <div class="card-header card-no-border">
+                <h5>Genel Kasa Durumu</h5>
+            </div>
+            <div class="card-body pt-0">
+                <div class="row m-0 overall-card">
+                    <div class="col-xl-9 col-md-12 col-sm-7 p-0">
+                        <div class="chart-right">
+                            <div class="row">
+                                <div class="col-xl-12">
+                                    <div class="card-body p-0">
+                                        <ul class="balance-data">
+                                            <li>
+                                                <span class="circle bg-warning"> </span><span class="f-light ms-1">Gelir</span>
+                                            </li>
+                                            <li>
+                                                <span class="circle bg-primary"> </span><span class="f-light ms-1">Gider</span>
+                                            </li>
+                                        </ul>
+                                        <div class="current-sale-container">
+                                            <apexchart height="305" type="bar" :options="apexDashboard.options3" :series="apexDashboard.series3"></apexchart>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-12 col-sm-5 p-0">
+                        <div class="row g-sm-4 g-2">
+                            <div class="col-xl-12 col-md-4" v-for="item in overallbalance" :key="item">
+                                <div class="light-card balance-card widget-hover">
+                                    <div class="svg-box">
+                                        <svg class="svg-fill">
+                                            <use :xlink:href="require('@/assets/svg/icon-sprite.svg') + `#${item.iconName}`"></use>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="f-dark">{{ item.title }}</span>
+                                        <h6 class="mt-1 mb-0">{{ item.amount }}</h6>
+                                    </div>
+                                  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </template>
+    
+    <script>
+    import DropDown1 from "../base/dropdown/DropDown1.vue"
+    import {
+        overallbalance
+    } from "../../../data/dashboard/default"
+    import {
+        apexDashboard
+    } from "../../../data/comon";
+    export default {
+        components: {
+            DropDown1
+        },
+        data() {
+            return {
+                apexDashboard: apexDashboard,
+                overallbalance: overallbalance
+            };
+        },
+    }
+    </script>
+    

@@ -1,0 +1,16 @@
+{
+  "auth0": {
+    "domain": "Enter Domain",
+    "clientID": "Enter Clientid"
+  },
+
+ 
+  "firebase": {
+    "apiKey": "AIzaSyB7ISvc6ROsazaS1kR_k62a4X6LmLVuYlY",
+    "authDomain": "herakles-hotel.firebaseapp.com",
+    "databaseURL": "Enter Database URL",
+    "projectId": "herakles-hotel",
+    "storageBucket": "herakles-hotel.appspot.com",
+    "messagingSenderId": "96808840790"
+  }
+}
