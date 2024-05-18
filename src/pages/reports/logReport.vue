@@ -17,7 +17,7 @@
           </div>
           <div class="table-responsive">
             <div class="row">
-                <div class="col-md-2">
+                <!-- <div class="col-md-2">
                 <input class="form-control digits" v-model="selectedDate" type="date"> 
               </div>
               <div class="col-md-2">
@@ -25,6 +25,15 @@
               </div>
               <div class="col-md-2">
                 <button class="btn  btn-primary btn-air-primary" @click="filterByDate">Filtrele </button>
+              </div> -->
+              <div class="col-md-2">
+                <input class="form-control digits" v-model="startDate" type="date" placeholder="Başlangıç Tarihi">
+              </div>
+              <div class="col-md-2">
+                <input class="form-control digits" v-model="endDate" type="date" placeholder="Bitiş Tarihi">
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary btn-air-primary" @click="filterByDate">Filtrele</button>
               </div>
               </div>
             <div style="display: flex; justify-content: flex-end;"> 
@@ -165,58 +174,34 @@ export default {
 //     return callDate >=selectedDate;
 //   }); 
 //     },
-filterByDate(){
-  if (!this.selectedDate ||  this.selectedDate2) {
-        this.tableDataContent =this.$store.getters.GetCaller; 
-    return;
-  }
-      if (this.selectedDate & this.selectedDate2) {
-  const dateParts = this.selectedDate.split('-');  
-  const dateParts2 = this.selectedDate2.split('-');  
-  if (dateParts.length === 3 && dateParts2.length === 3) { 
-    const day = dateParts[0];
-    const month = dateParts[1];
-    const year = dateParts[2];
-    this.selectedDate = `${day}.${month}.${year}`; 
-    
-    const day2 = dateParts2[0];
-    const month2 = dateParts2[1];
-    const year2 = dateParts2[2];
-    this.selectedDate2 = `${day2}.${month2}.${year2}`; 
-  }
-}
-     const selectedDateParts = this.selectedDate.split('.');
-  const selectedDay = parseInt(selectedDateParts[0], 10);
-  const selectedMonth = parseInt(selectedDateParts[1], 10) - 1;  
-  const selectedYear = parseInt(selectedDateParts[2], 10);
+filterByDate() {
+      const start = this.startDate ? new Date(this.startDate) : null;
+      const end = this.endDate ? new Date(this.endDate) : null;
+      if (!start && !end) {
+        this.tableDataContent = this.$store.getters.GetCaller;
+        return;
+      }
 
-  const selectedDate = new Date(selectedYear, selectedMonth, selectedDay);
-
-  //////
-   const selectedDateParts2 = this.selectedDate2.split('.');
-  const selectedDay2 = parseInt(selectedDateParts2[0], 10);
-  const selectedMonth2 = parseInt(selectedDateParts2[1], 10) - 1;  
-  const selectedYear2 = parseInt(selectedDateParts[2], 10);
-
-  const selectedDate2 = new Date(selectedYear2, selectedMonth2, selectedDay2);
-  console.log(this.selectedDate)   
-  console.log(this.selectedDate2)
-  
-      const startDate =  selectedDate;
-      const endDate =  selectedDate2;
-      
       this.tableDataContent = this.$store.getters.GetCaller.filter(item => {
-        const callDate = moment(item.CallDate, 'DD.MM.YYYY');
-        return callDate.isBetween(startDate, endDate, null, '[]');  
+       
+        const [day, month, year] = item.CallDate.split('.').map(Number);
+        const callDate = new Date(year, month - 1, day);
+
+        if (start && end) {
+          return callDate >= start && callDate <= end;
+        } else if (start) {
+          return callDate >= start;
+        } else if (end) {
+          return callDate <= end;
+        }
       });
-      console.log(this.tableDataContent)
     },
-    exportToExcel() {
+      exportToExcel() {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet 1');
       worksheet.addRow(['Ad', 'Soyad', 'Doğum Tarihi', 'Telefon', 'Erişim İzni', 'Arama Tarihi']);
-      // Verileri tabloya ekleyin (örnek olarak)
-      const tableData =  this.tableDataContent;
+      
+      const tableData =  this.tableDataContent ;
       tableData.forEach((row) => {
         worksheet.addRow([row.FirsName, row.LastName, row.BirthDate, row.Phone, row.GsmCheck, row.CallDate]);
       });
@@ -226,7 +211,7 @@ filterByDate(){
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
-        link.download = 'AramaKayitlari.xlsx';
+        link.download = 'EskiMüsteriAramaKayitlari.xlsx';
         link.click();
       });
     },

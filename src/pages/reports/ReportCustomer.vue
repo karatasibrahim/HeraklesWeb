@@ -17,11 +17,20 @@
             </div>
             <div class="table-responsive">
               <div class="row">
-                <div class="col-md-2">
+                <!-- <div class="col-md-2">
                 <input class="form-control digits" v-model="selectedDate" type="date"> 
               </div>
               <div class="col-md-2">
                 <button class="btn  btn-primary btn-air-primary" @click="filterByDate">Filtrele </button>
+              </div> -->
+              <div class="col-md-2">
+                <input class="form-control digits" v-model="startDate" type="date" placeholder="Başlangıç Tarihi">
+              </div>
+              <div class="col-md-2">
+                <input class="form-control digits" v-model="endDate" type="date" placeholder="Bitiş Tarihi">
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary btn-air-primary" @click="filterByDate">Filtrele</button>
               </div>
               </div>
                 <div style="display: flex; justify-content: flex-end;"> 
@@ -118,48 +127,70 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   
     methods: {
       ...mapActions(["AddData", "EditData", "DeleteData", "myQuery"]),
-      filterByDate(){
-      if (!this.selectedDate) {
-        this.tableDataContent =this.$store.getters.GetCustomerCaller; 
-    return;
-  }
-      if (this.selectedDate) {
-  const dateParts = this.selectedDate.split('-');  
+//       filterByDate(){
+//       if (!this.selectedDate) {
+//         this.tableDataContent =this.$store.getters.GetCustomerCaller; 
+//     return;
+//   }
+//       if (this.selectedDate) {
+//   const dateParts = this.selectedDate.split('-');  
 
-  if (dateParts.length === 3) {
-    const day = dateParts[2];
-    const month = dateParts[1];
-    const year = dateParts[0];
-    this.selectedDate=` ${day}.${month}.${year}`
+//   if (dateParts.length === 3) {
+//     const day = dateParts[2];
+//     const month = dateParts[1];
+//     const year = dateParts[0];
+//     this.selectedDate=` ${day}.${month}.${year}`
      
   
-  }
-}
+//   }
+// }
 
-const selectedDateParts = this.selectedDate.split('.');
-  const selectedDay = parseInt(selectedDateParts[0], 10);
-  const selectedMonth = parseInt(selectedDateParts[1], 10) - 1; // JavaScript ay indeksi 0 ile başlar
-  const selectedYear = parseInt(selectedDateParts[2], 10);
+// const selectedDateParts = this.selectedDate.split('.');
+//   const selectedDay = parseInt(selectedDateParts[0], 10);
+//   const selectedMonth = parseInt(selectedDateParts[1], 10) - 1; 
+//   const selectedYear = parseInt(selectedDateParts[2], 10);
 
-  const selectedDate = new Date(selectedYear, selectedMonth, selectedDay);
+//   const selectedDate = new Date(selectedYear, selectedMonth, selectedDay);
   
-  this.tableDataContent = this.$store.getters.GetCustomerCaller.filter(item => {
+//   this.tableDataContent = this.$store.getters.GetCustomerCaller.filter(item => {
     
-    const callDateParts = item.CallDate.split('.');
-    const callDay = parseInt(callDateParts[0], 10);
-    const callMonth = parseInt(callDateParts[1], 10) - 1;
-    const callYear = parseInt(callDateParts[2], 10);
+//     const callDateParts = item.CallDate.split('.');
+//     const callDay = parseInt(callDateParts[0], 10);
+//     const callMonth = parseInt(callDateParts[1], 10) - 1;
+//     const callYear = parseInt(callDateParts[2], 10);
 
-    const callDate = new Date(callYear, callMonth, callDay);
+//     const callDate = new Date(callYear, callMonth, callDay);
  
-    return callDate >=selectedDate;
-  }); 
+//     return callDate >=selectedDate;
+//   }); 
+//     },
+filterByDate() {
+      const start = this.startDate ? new Date(this.startDate) : null;
+      const end = this.endDate ? new Date(this.endDate) : null;
+      if (!start && !end) {
+        this.tableDataContent = this.$store.getters.GetCustomerCaller;
+        return;
+      }
+
+      this.tableDataContent = this.$store.getters.GetCustomerCaller.filter(item => {
+        if (!item.IsCustomer) return false; 
+        const [day, month, year] = item.CallDate.split('.').map(Number);
+        const callDate = new Date(year, month - 1, day);
+
+        if (start && end) {
+          return callDate >= start && callDate <= end;
+        } else if (start) {
+          return callDate >= start;
+        } else if (end) {
+          return callDate <= end;
+        }
+      });
     },
       exportToExcel() {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet 1');
       worksheet.addRow(['Ad', 'Soyad', 'Doğum Tarihi', 'Telefon', 'Erişim İzni', 'Arama Tarihi']);
-      // Verileri tabloya ekleyin (örnek olarak)
+      
       const tableData =  this.tableDataContent ;
       tableData.forEach((row) => {
         worksheet.addRow([row.FirsName, row.LastName, row.BirthDate, row.Phone, row.GsmCheck, row.CallDate]);
